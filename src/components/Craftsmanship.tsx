@@ -14,7 +14,7 @@ const Craftsmanship: React.FC = () => {
         'Refine cultural authenticity',
         'Create modern adaptations'
       ],
-      image: '/logo.jpg',
+      image: '/fabrics.png',
       color: 'from-kashmir-gold to-yellow-400',
     },
     {
@@ -27,7 +27,7 @@ const Craftsmanship: React.FC = () => {
         'Quality assessment',
         'Cultural significance review'
       ],
-      image: '/logo.jpg',
+      image: '/fabrics.png',
       color: 'from-midnight-plum to-purple-600',
     },
     {
@@ -40,7 +40,7 @@ const Craftsmanship: React.FC = () => {
         'Quality control checkpoints',
         'Final finishing touches'
       ],
-      image: '/logo.jpg',
+      image: '/books.png',
       color: 'from-rose-400 to-pink-500',
     },
   ];
