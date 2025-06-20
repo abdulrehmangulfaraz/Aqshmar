@@ -128,7 +128,7 @@ const Hero: React.FC = () => {
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 >
                   <img
-                    src='/logo.jpg/logo.jpg'
+                    src='/logo.jpg'
                     alt="Hand-embroidered tee"
                     className="w-full h-full object-cover"
                   />
