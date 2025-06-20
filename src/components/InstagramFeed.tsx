@@ -10,18 +10,18 @@ const InstagramFeed: React.FC = () => {
       image: '/14-aug-insta.png',
       caption: 'Celebrate the spirit of freedom and patriotism with our exclusive "AZADI TEE"🇵🇰 Commemorate the 14th of August in style 💚This vibrant tee features a unique and bold design ,showcasing the colors and symbol of Pakistan 💚🇵🇰',
       likes: 234,
-      url: 'https://www.instagram.com/p/DJbsZizsYgH/',
+      url: 'https://www.instagram.com/p/C-KouzUovcC/?img_index=1',
     },
     {
       id: '2',
-      image: 'https://scontent-lhr8-1.cdninstagram.com/v/t51.29350-15/469234567_18472345678901234_1234567890123456789_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=18de74&_nc_ohc=def456&_nc_ht=scontent-lhr8-1.cdninstagram.com&oh=00_def456&oe=def456',
-      caption: 'The intricate details of our Heritage Rose collection 🌹 Hours of love and patience in every piece. #heritagerose #embroideryart #handmade',
+      image: '/Insta-2.png',
+      caption: 'We\'re back and brighter than ever !!💫Stay tuned for Aqshmar\'s Summer Collection\'25! 🧵Vibrant hues ,intricate embroidery amd effortless styles are coming your way !!👕🛍 Coming soon !! Stay tuned ! ',
       likes: 189,
       url: 'https://www.instagram.com/p/DIYnCk_AfHR/',
     },
     {
       id: '3',
-      image: 'https://scontent-lhr8-1.cdninstagram.com/v/t51.29350-15/467890123_18471234567890123_9876543210987654321_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=18de74&_nc_ohc=ghi789&_nc_ht=scontent-lhr8-1.cdninstagram.com&oh=00_ghi789&oe=ghi789',
+      image: 'Insta-3.png',
       caption: 'Behind the scenes: Creating magic with needle and thread 🧵 The Garden of Kashmir pattern coming to life. #behindthescenes #kashmirpattern #artisanwork',
       likes: 156,
       url: 'https://www.instagram.com/p/DFAfwO9IcWO/?img_index=2',
@@ -119,7 +119,7 @@ const InstagramFeed: React.FC = () => {
               <img
                 src={[
                   '/14-aug-insta.png',
-                  '/logo.jpg',
+                  '/Insta-2.png',
                   '/logo.jpg',
                   '/logo.jpg',
                   '/logo.jpg',
