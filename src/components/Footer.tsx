@@ -42,7 +42,7 @@ const Footer: React.FC = () => {
                   className="h-12 w-12 rounded-full object-cover shadow-lg border-2 border-kashmir-gold/30 mr-3"
                 />
                 <h3 className="text-3xl lg:text-4xl font-serif font-bold">
-                  Aqshmar
+                  Aqshmar 
                 </h3>
               </motion.div>
               <p className="text-rose-blush leading-relaxed mb-6 max-w-md">
