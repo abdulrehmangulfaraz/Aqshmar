@@ -120,7 +120,7 @@ const InstagramFeed: React.FC = () => {
                 src={[
                   '/14-aug-insta.png',
                   '/Insta-2.png',
-                  '/logo.jpg',
+                  '/Insta-3.png',
                   '/logo.jpg',
                   '/logo.jpg',
                   '/logo.jpg',
