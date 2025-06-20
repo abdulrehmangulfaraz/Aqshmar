@@ -7,8 +7,8 @@ const InstagramFeed: React.FC = () => {
   const instagramPosts = [
     {
       id: '1',
-      image: 'https://www.instagram.com/p/DJbsZizsYgH/',
-      caption: 'Exquisite hand embroidery work in progress ✨ Each stitch tells a story of tradition and artistry. #handembroidery #aqshmar #pakistanicraft',
+      image: '/14-aug-insta.png',
+      caption: 'Celebrate the spirit of freedom and patriotism with our exclusive "AZADI TEE"🇵🇰 Commemorate the 14th of August in style 💚This vibrant tee features a unique and bold design ,showcasing the colors and symbol of Pakistan 💚🇵🇰',
       likes: 234,
       url: 'https://www.instagram.com/p/DJbsZizsYgH/',
     },
@@ -118,7 +118,7 @@ const InstagramFeed: React.FC = () => {
               {/* Post Image - Using high-quality embroidery images as fallback */}
               <img
                 src={[
-                  '/logo.jpg',
+                  '/14-aug-insta.png',
                   '/logo.jpg',
                   '/logo.jpg',
                   '/logo.jpg',
