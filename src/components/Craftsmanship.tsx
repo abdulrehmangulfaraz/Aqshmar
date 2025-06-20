@@ -40,7 +40,7 @@ const Craftsmanship: React.FC = () => {
         'Quality control checkpoints',
         'Final finishing touches'
       ],
-      image: '/books.png',
+      image: '/stiching.jpg',
       color: 'from-rose-400 to-pink-500',
     },
   ];
