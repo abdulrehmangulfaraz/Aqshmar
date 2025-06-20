@@ -114,7 +114,7 @@ const Testimonials: React.FC = () => {
                   "{testimonials[currentIndex].quote}"
                 </motion.blockquote>
 
-                {/* Customer Info */
+                {/* Customer Info */}
                 <motion.div
                   className="flex items-center justify-center space-x-4"
                   initial={{ opacity: 0, y: 30 }}
