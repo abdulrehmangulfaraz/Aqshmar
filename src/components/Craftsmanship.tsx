@@ -14,7 +14,7 @@ const Craftsmanship: React.FC = () => {
         'Refine cultural authenticity',
         'Create modern adaptations'
       ],
-      image: '/fabrics.png',
+      image: '/pattern.jpg',
       color: 'from-kashmir-gold to-yellow-400',
     },
     {
