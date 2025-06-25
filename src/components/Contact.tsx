@@ -21,26 +21,27 @@ const Contact: React.FC = () => {
     }));
   };
 
+  const encode = (data: any) => {
+    return Object.keys(data)
+      .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
+      .join('&');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
     
     try {
-      // Create form data for Netlify
-      const netlifyFormData = new FormData();
-      netlifyFormData.append('form-name', 'contact');
-      netlifyFormData.append('name', formData.name);
-      netlifyFormData.append('email', formData.email);
-      netlifyFormData.append('subject', formData.subject);
-      netlifyFormData.append('message', formData.message);
-      netlifyFormData.append('customOrder', formData.customOrder.toString());
-
       // Submit to Netlify
       const response = await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(netlifyFormData as any).toString(),
+        body: encode({
+          'form-name': 'contact',
+          ...formData,
+          customOrder: formData.customOrder ? 'Yes' : 'No'
+        }),
       });
 
       if (response.ok) {
@@ -119,23 +120,17 @@ const Contact: React.FC = () => {
                 </h3>
               </div>
 
-              {/* Hidden form for Netlify */}
-              <form name="contact" netlify hidden>
-                <input type="text" name="name" />
-                <input type="email" name="email" />
-                <select name="subject">
-                  <option value="Inquiry">General Inquiry</option>
-                  <option value="Custom Order">Custom Order Request</option>
-                  <option value="Collaboration">Partnership/Collaboration</option>
-                  <option value="Press">Press & Media</option>
-                  <option value="Other">Other</option>
-                </select>
-                <textarea name="message"></textarea>
-                <input type="checkbox" name="customOrder" />
-              </form>
-
-              <form onSubmit={handleSubmit} className="space-y-6" name="contact" method="POST" data-netlify="true">
+              {/* Netlify Form */}
+              <form 
+                onSubmit={handleSubmit} 
+                className="space-y-6" 
+                name="contact" 
+                method="POST" 
+                data-netlify="true"
+                data-netlify-honeypot="bot-field"
+              >
                 <input type="hidden" name="form-name" value="contact" />
+                <input type="hidden" name="customOrder" value={formData.customOrder ? 'Yes' : 'No'} />
                 
                 {/* Name & Email Row */}
                 <div className="grid md:grid-cols-2 gap-6">
