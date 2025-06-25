@@ -14,7 +14,7 @@ const Cart: React.FC = () => {
     
     const total = getTotalPrice().toLocaleString();
     const message = `Hi! I'd like to place an order:\n\n${orderDetails}\n\nTotal: Rs. ${total}\n\nPlease let me know the next steps. Thank you!`;
-    const whatsappUrl = `https://wa.me/+923001234567?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/+923051352002?text=${encodeURIComponent(message)}`;
     
     window.open(whatsappUrl, '_blank');
   };

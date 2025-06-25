@@ -1,7 +1,7 @@
 // src/components/Collection.tsx
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Eye, X, Heart } from 'lucide-react';
+import { ShoppingBag, Eye, X } from 'lucide-react';
 import { products } from '../data/products';
 import { useCartStore } from '../store/cartStore';
 import { Product } from '../types';
@@ -13,17 +13,22 @@ const Collection: React.FC = () => {
   const [visibleProducts, setVisibleProducts] = useState<number>(6);
   const { addItem } = useCartStore();
 
-  // Updated categories based on actual products
+  // Original categories as requested
   const categories = [
     'All',
     'Embroidered Collection',
     'Matching Sets',
-    'Casual Wear',
+    'Sweatshirts',
     'Hoodies',
     'Designer Collection',
-    'Seasonal',
-    'Themed Collection',
-    'Special Editions'
+    'Activewear',
+    'Graphic Tees',
+    'Floral Collection',
+    'Special Editions',
+    'Kids Collection',
+    'Customized',
+    'Political Collection',
+    'Pop Culture'
   ];
   
   const filteredProducts = filter === 'All' 
@@ -72,32 +77,41 @@ const Collection: React.FC = () => {
           </motion.p>
         </motion.div>
 
-        {/* Category Filter */}
+        {/* Enhanced Category Filter with original categories */}
         <motion.div
-          className="flex flex-wrap justify-center gap-4 mb-12"
+          className="mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          {categories.map((category) => (
-            <motion.button
-              key={category}
-              onClick={() => {
-                setFilter(category);
-                setVisibleProducts(6); // Reset to 6 when changing filter
-              }}
-              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                filter === category
-                  ? 'bg-midnight-plum text-pearl-white shadow-lg'
-                  : 'bg-rose-blush text-midnight-plum hover:bg-kashmir-gold hover:text-pearl-white'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {category}
-            </motion.button>
-          ))}
+          <div className="relative">
+            <div className="flex overflow-x-auto pb-6 scrollbar-hide">
+              <div className="flex space-x-3 px-1">
+                {categories.map((category) => (
+                  <motion.button
+                    key={category}
+                    onClick={() => {
+                      setFilter(category);
+                      setVisibleProducts(6);
+                    }}
+                    className={`whitespace-nowrap px-5 py-2.5 rounded-full font-medium transition-all duration-300 text-sm md:text-base ${
+                      filter === category
+                        ? 'bg-midnight-plum text-pearl-white shadow-lg'
+                        : 'bg-rose-blush text-midnight-plum hover:bg-kashmir-gold hover:text-pearl-white'
+                    }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {category}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+            {/* Gradient fade effect on sides */}
+            <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-pearl-white to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-pearl-white to-transparent pointer-events-none" />
+          </div>
         </motion.div>
 
         {/* Products Grid */}
@@ -114,7 +128,7 @@ const Collection: React.FC = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500"
                 whileHover={{ y: -8 }}
               >
                 {/* Product Image */}
@@ -122,15 +136,15 @@ const Collection: React.FC = () => {
                   <motion.img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-midnight-plum/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-midnight-plum/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
                   {/* Badges */}
                   <div className="absolute top-4 left-4 flex gap-2">
                     {product.featured && (
                       <motion.div
-                        className="bg-kashmir-gold text-pearl-white px-3 py-1 rounded-full text-sm font-medium"
+                        className="bg-kashmir-gold text-pearl-white px-3 py-1 rounded-full text-sm font-medium shadow-md"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.2 }}
@@ -140,7 +154,7 @@ const Collection: React.FC = () => {
                     )}
                     {product.isNew && (
                       <motion.div
-                        className="bg-rose-blush text-midnight-plum px-3 py-1 rounded-full text-sm font-medium"
+                        className="bg-rose-blush text-midnight-plum px-3 py-1 rounded-full text-sm font-medium shadow-md"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.3 }}
@@ -150,9 +164,9 @@ const Collection: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons - Removed heart icon */}
                   <motion.div
-                    className="absolute top-4 right-4 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     initial={{ x: 20 }}
                     whileInView={{ x: 0 }}
                     transition={{ delay: 0.3 }}
@@ -164,13 +178,6 @@ const Collection: React.FC = () => {
                       whileTap={{ scale: 0.9 }}
                     >
                       <Eye className="w-5 h-5 text-midnight-plum" />
-                    </motion.button>
-                    <motion.button
-                      className="bg-pearl-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-rose-blush transition-colors duration-300"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <Heart className="w-5 h-5 text-midnight-plum" />
                     </motion.button>
                   </motion.div>
                 </div>
@@ -190,7 +197,7 @@ const Collection: React.FC = () => {
                     {product.colors.map(color => (
                       <span 
                         key={color}
-                        className="text-xs px-2 py-1 rounded-full border border-dust-beige"
+                        className="text-xs px-2 py-1 rounded-full border border-dust-beige bg-pearl-white/50"
                       >
                         {color}
                       </span>
@@ -242,7 +249,7 @@ const Collection: React.FC = () => {
           >
             <button
               onClick={loadMore}
-              className="bg-midnight-plum text-pearl-white px-8 py-3 rounded-lg hover:bg-kashmir-gold transition-colors duration-300 font-medium"
+              className="bg-midnight-plum text-pearl-white px-8 py-3 rounded-lg hover:bg-kashmir-gold transition-colors duration-300 font-medium shadow-lg hover:shadow-xl"
             >
               Show More
             </button>
@@ -253,14 +260,14 @@ const Collection: React.FC = () => {
         <AnimatePresence>
           {selectedProduct && (
             <motion.div
-              className="fixed inset-0 bg-midnight-plum/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              className="fixed inset-0 bg-midnight-plum/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedProduct(null)}
             >
               <motion.div
-                className="bg-pearl-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+                className="bg-pearl-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
@@ -273,11 +280,11 @@ const Collection: React.FC = () => {
                     <img
                       src={selectedProduct.image}
                       alt={selectedProduct.name}
-                      className="w-full h-96 md:h-full object-cover rounded-2xl"
+                      className="w-full h-96 md:h-full object-cover rounded-2xl shadow-lg"
                     />
                     <motion.button
                       onClick={() => setSelectedProduct(null)}
-                      className="absolute top-4 right-4 bg-pearl-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-pearl-white transition-colors duration-300"
+                      className="absolute top-4 right-4 bg-pearl-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-rose-blush transition-colors duration-300"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
@@ -291,14 +298,19 @@ const Collection: React.FC = () => {
                       <h3 className="text-3xl font-serif font-bold text-midnight-plum mb-2">
                         {selectedProduct.name}
                       </h3>
-                      <div className="text-2xl font-serif font-bold text-kashmir-gold mb-4">
-                        Rs. {selectedProduct.price.toLocaleString()}
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="text-2xl font-serif font-bold text-kashmir-gold">
+                          Rs. {selectedProduct.price.toLocaleString()}
+                        </div>
+                        <span className="px-3 py-1 bg-midnight-plum/10 text-midnight-plum rounded-full text-sm font-medium border border-midnight-plum/20">
+                          {selectedProduct.category}
+                        </span>
                       </div>
                       <div className="flex flex-wrap gap-2 mb-4">
                         {selectedProduct.colors.map(color => (
                           <span 
                             key={color}
-                            className="px-3 py-1 rounded-full border border-dust-beige text-sm"
+                            className="px-3 py-1 rounded-full border border-dust-beige text-sm bg-pearl-white/50"
                           >
                             {color}
                           </span>
@@ -321,7 +333,7 @@ const Collection: React.FC = () => {
                             onClick={() => setSelectedSize(size)}
                             className={`px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
                               selectedSize === size
-                                ? 'border-midnight-plum bg-midnight-plum text-pearl-white'
+                                ? 'border-midnight-plum bg-midnight-plum text-pearl-white shadow-md'
                                 : 'border-dust-beige text-midnight-plum hover:border-kashmir-gold'
                             }`}
                           >
@@ -334,7 +346,7 @@ const Collection: React.FC = () => {
                     {/* Add to Cart */}
                     <motion.button
                       onClick={() => handleAddToCart(selectedProduct, selectedSize)}
-                      className="w-full bg-midnight-plum text-pearl-white py-4 rounded-lg font-medium hover:bg-kashmir-gold transition-colors duration-300 flex items-center justify-center space-x-3"
+                      className="w-full bg-midnight-plum text-pearl-white py-4 rounded-lg font-medium hover:bg-kashmir-gold transition-colors duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -345,7 +357,7 @@ const Collection: React.FC = () => {
                     {/* Additional Info */}
                     <div className="space-y-6">
                       {/* Fabric Info */}
-                      <div className="border-t border-dust-beige pt-4">
+                      <div className="border-t border-dust-beige/50 pt-4">
                         <h4 className="text-lg font-medium text-midnight-plum mb-2">
                           Fabric & Care
                         </h4>
@@ -355,7 +367,7 @@ const Collection: React.FC = () => {
                       </div>
 
                       {/* Care Instructions */}
-                      <div className="border-t border-dust-beige pt-4">
+                      <div className="border-t border-dust-beige/50 pt-4">
                         <h4 className="text-lg font-medium text-midnight-plum mb-3">
                           Care Instructions
                         </h4>
@@ -372,6 +384,25 @@ const Collection: React.FC = () => {
                           ))}
                         </ul>
                       </div>
+
+                      {/* Tags */}
+                      {selectedProduct.tags && (
+                        <div className="border-t border-dust-beige/50 pt-4">
+                          <h4 className="text-lg font-medium text-midnight-plum mb-3">
+                            Tags
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedProduct.tags.map((tag, index) => (
+                              <span 
+                                key={index}
+                                className="px-3 py-1 bg-midnight-plum/10 text-midnight-plum rounded-full text-sm border border-midnight-plum/20"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
