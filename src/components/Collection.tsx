@@ -1,3 +1,4 @@
+// src/components/Collection.tsx
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Eye, X, Heart } from 'lucide-react';
@@ -9,17 +10,35 @@ const Collection: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>('M');
   const [filter, setFilter] = useState<string>('All');
+  const [visibleProducts, setVisibleProducts] = useState<number>(6);
   const { addItem } = useCartStore();
 
-  const categories = ['All', 'Floral', 'Traditional', 'Contemporary', 'Heritage', 'Spiritual', 'Whimsical'];
+  // Updated categories based on actual products
+  const categories = [
+    'All',
+    'Embroidered Collection',
+    'Matching Sets',
+    'Casual Wear',
+    'Hoodies',
+    'Designer Collection',
+    'Seasonal',
+    'Themed Collection',
+    'Special Editions'
+  ];
   
   const filteredProducts = filter === 'All' 
     ? products 
     : products.filter(product => product.category === filter);
 
+  const productsToShow = filteredProducts.slice(0, visibleProducts);
+
   const handleAddToCart = (product: Product, size: string) => {
     addItem(product, size);
     setSelectedProduct(null);
+  };
+
+  const loadMore = () => {
+    setVisibleProducts(prev => prev + 6);
   };
 
   return (
@@ -49,8 +68,7 @@ const Collection: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
           >
-            Each piece in our collection tells a unique story, blending traditional Pakistani embroidery 
-            with contemporary fashion sensibilities.
+            Handcrafted pieces that blend traditional craftsmanship with contemporary designs.
           </motion.p>
         </motion.div>
 
@@ -65,7 +83,10 @@ const Collection: React.FC = () => {
           {categories.map((category) => (
             <motion.button
               key={category}
-              onClick={() => setFilter(category)}
+              onClick={() => {
+                setFilter(category);
+                setVisibleProducts(6); // Reset to 6 when changing filter
+              }}
               className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                 filter === category
                   ? 'bg-midnight-plum text-pearl-white shadow-lg'
@@ -85,7 +106,7 @@ const Collection: React.FC = () => {
           layout
         >
           <AnimatePresence>
-            {filteredProducts.map((product, index) => (
+            {productsToShow.map((product, index) => (
               <motion.div
                 key={product.id}
                 layout
@@ -105,17 +126,29 @@ const Collection: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-midnight-plum/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
-                  {/* Featured Badge */}
-                  {product.featured && (
-                    <motion.div
-                      className="absolute top-4 left-4 bg-kashmir-gold text-pearl-white px-3 py-1 rounded-full text-sm font-medium"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.2 }}
-                    >
-                      Featured
-                    </motion.div>
-                  )}
+                  {/* Badges */}
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    {product.featured && (
+                      <motion.div
+                        className="bg-kashmir-gold text-pearl-white px-3 py-1 rounded-full text-sm font-medium"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        Featured
+                      </motion.div>
+                    )}
+                    {product.isNew && (
+                      <motion.div
+                        className="bg-rose-blush text-midnight-plum px-3 py-1 rounded-full text-sm font-medium"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        New
+                      </motion.div>
+                    )}
+                  </div>
 
                   {/* Action Buttons */}
                   <motion.div
@@ -153,13 +186,24 @@ const Collection: React.FC = () => {
                     {product.name}
                   </motion.h3>
                   
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {product.colors.map(color => (
+                      <span 
+                        key={color}
+                        className="text-xs px-2 py-1 rounded-full border border-dust-beige"
+                      >
+                        {color}
+                      </span>
+                    ))}
+                  </div>
+
                   <motion.p
                     className="text-warm-gray text-sm mb-4 line-clamp-2"
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                   >
-                    {product.description.substring(0, 100)}...
+                    {product.description}
                   </motion.p>
 
                   <div className="flex items-center justify-between">
@@ -187,6 +231,23 @@ const Collection: React.FC = () => {
             ))}
           </AnimatePresence>
         </motion.div>
+
+        {/* Load More Button */}
+        {visibleProducts < filteredProducts.length && (
+          <motion.div 
+            className="text-center mt-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <button
+              onClick={loadMore}
+              className="bg-midnight-plum text-pearl-white px-8 py-3 rounded-lg hover:bg-kashmir-gold transition-colors duration-300 font-medium"
+            >
+              Show More
+            </button>
+          </motion.div>
+        )}
 
         {/* Product Modal */}
         <AnimatePresence>
@@ -233,6 +294,16 @@ const Collection: React.FC = () => {
                       <div className="text-2xl font-serif font-bold text-kashmir-gold mb-4">
                         Rs. {selectedProduct.price.toLocaleString()}
                       </div>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {selectedProduct.colors.map(color => (
+                          <span 
+                            key={color}
+                            className="px-3 py-1 rounded-full border border-dust-beige text-sm"
+                          >
+                            {color}
+                          </span>
+                        ))}
+                      </div>
                       <p className="text-warm-gray leading-relaxed">
                         {selectedProduct.description}
                       </p>
@@ -271,25 +342,36 @@ const Collection: React.FC = () => {
                       <span>Add to Cart</span>
                     </motion.button>
 
-                    {/* Care Instructions */}
-                    <div className="border-t border-dust-beige pt-6">
-                      <h4 className="text-lg font-medium text-midnight-plum mb-3">
-                        Care Instructions
-                      </h4>
-                      <ul className="space-y-2 text-warm-gray">
-                        <li className="flex items-center">
-                          <div className="w-2 h-2 bg-kashmir-gold rounded-full mr-3" />
-                          Hand wash in cold water
-                        </li>
-                        <li className="flex items-center">
-                          <div className="w-2 h-2 bg-kashmir-gold rounded-full mr-3" />
-                          Lay flat to dry
-                        </li>
-                        <li className="flex items-center">
-                          <div className="w-2 h-2 bg-kashmir-gold rounded-full mr-3" />
-                          Store away from direct sunlight
-                        </li>
-                      </ul>
+                    {/* Additional Info */}
+                    <div className="space-y-6">
+                      {/* Fabric Info */}
+                      <div className="border-t border-dust-beige pt-4">
+                        <h4 className="text-lg font-medium text-midnight-plum mb-2">
+                          Fabric & Care
+                        </h4>
+                        <p className="text-warm-gray">
+                          Material: {selectedProduct.fabric}
+                        </p>
+                      </div>
+
+                      {/* Care Instructions */}
+                      <div className="border-t border-dust-beige pt-4">
+                        <h4 className="text-lg font-medium text-midnight-plum mb-3">
+                          Care Instructions
+                        </h4>
+                        <ul className="space-y-2 text-warm-gray">
+                          {(selectedProduct.careInstructions || [
+                            'Hand wash in cold water',
+                            'Lay flat to dry',
+                            'Store away from direct sunlight'
+                          ]).map((instruction, index) => (
+                            <li key={index} className="flex items-center">
+                              <div className="w-2 h-2 bg-kashmir-gold rounded-full mr-3" />
+                              {instruction}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>

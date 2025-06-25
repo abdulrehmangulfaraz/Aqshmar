@@ -1,12 +1,19 @@
+// src/types.ts
 export interface Product {
   id: string;
   name: string;
   price: number;
   image: string;
+  images?: string[];
   description: string;
   sizes: string[];
+  colors: string[];
+  fabric: string;
   category: string;
-  featured: boolean;
+  featured?: boolean;
+  isNew?: boolean;
+  tags?: string[];
+  careInstructions?: string[];
 }
 
 export interface CartItem {
