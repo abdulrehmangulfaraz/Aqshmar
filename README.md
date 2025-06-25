@@ -132,21 +132,6 @@ Visit `http://localhost:3000` to view the site locally.
 
 ---
 
-## 📸 Previews
-
-> *(You can add a preview image here from `/public` later)*
-> Example:
-
-```
-📷 Homepage  
-📷 Collection View  
-📷 Craftsmanship Steps  
-📷 Instagram Feed  
-📷 Contact Form
-```
-
----
-
 ## 🛡️ License
 
 This project is source-visible but protected under the **Aqshmar™ Custom License**.
