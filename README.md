@@ -172,7 +172,7 @@ To contribute:
 
 For custom design work, questions, or partnership proposals:
 
-📧 **[aqshmar.pk@gmail.com](mailto:aqshmar.pk@gmail.com)**
+📧 **[aqshmar.pk@gmail.com](mailto:aqshmar.pk@gmail.com)** <br>
 📧 **[abdulrehmangulfaraz1@gmail.com](mailto:abdulrehmangulfaraz1@gmail.com)**
 
 Developed with 🤍 by [Abdulrehman Gulfaraz](https://github.com/abdulrehmangulfaraz)
