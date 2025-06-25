@@ -22,30 +22,30 @@ const InstagramFeed: React.FC = () => {
     {
       id: '3',
       image: 'Insta-3.png',
-      caption: 'Behind the scenes: Creating magic with needle and thread 🧵 The Garden of Kashmir pattern coming to life. #behindthescenes #kashmirpattern #artisanwork',
+      caption: 'Make a statement with these quirky , matching shirt designed for perfect duo !!👭💓',
       likes: 156,
       url: 'https://www.instagram.com/p/DFAfwO9IcWO/?img_index=2',
     },
     {
       id: '4',
-      image: 'https://scontent-lhr8-1.cdninstagram.com/v/t51.29350-15/465432109_18470123456789012_5432109876543210987_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=18de74&_nc_ohc=jkl012&_nc_ht=scontent-lhr8-1.cdninstagram.com&oh=00_jkl012&oe=jkl012',
-      caption: 'The delicate art of French knots and satin stitches ✨ Every detail matters in our craft. #frenchknots #satinstitches #embroiderydetails',
+      image: 'Insta-4.png',
+      caption: 'Experience the comfort and sophistication  of Aqshmar\'s exclusive sweatshirt 🎀 Unique details that pay homage to the classic 🍂🥀',
       likes: 298,
-      url: 'https://www.instagram.com/p/DD10zKauBZv/?img_index=1',
+      url: 'https://www.instagram.com/p/DD10zKauBZv/?img_index=2',
     },
     {
       id: '5',
-      image: 'https://scontent-lhr8-1.cdninstagram.com/v/t51.29350-15/463210987_18469012345678901_2109876543210987654_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=18de74&_nc_ohc=mno345&_nc_ht=scontent-lhr8-1.cdninstagram.com&oh=00_mno345&oe=mno345',
+      image: 'Insta-5.png',
       caption: 'Moonlit Vine pattern in ethereal silver threads 🌙 Capturing the romance of midnight gardens in every stitch. #moonlitvine #silverthread #nightgarden',
       likes: 267,
       url: 'https://www.instagram.com/p/DC1xUsHorJy/?img_index=3',
     },
     {
       id: '6',
-      image: 'https://scontent-lhr8-1.cdninstagram.com/v/t51.29350-15/461098765_18468901234567890_8765432109876543210_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=18de74&_nc_ohc=pqr678&_nc_ht=scontent-lhr8-1.cdninstagram.com&oh=00_pqr678&oe=pqr678',
+      image: 'Insta-6.png',
       caption: 'Celebrating the timeless beauty of Pakistani embroidery 🇵🇰 Each piece carries the soul of our heritage. #pakistaniembroidery #culturalheritage #timelessbeauty',
       likes: 312,
-      url: 'https://www.instagram.com/p/C_VNQkCOW8s/',
+      url: 'https://www.instagram.com/p/C-klHAgIsMo/?img_index=1',
     },
   ];
 
@@ -121,9 +121,9 @@ const InstagramFeed: React.FC = () => {
                   '/14-aug-insta.png',
                   '/Insta-2.png',
                   '/Insta-3.png',
-                  '/logo.jpg',
-                  '/logo.jpg',
-                  '/logo.jpg',
+                  '/Insta-4.png',
+                  '/Insta-5.png',
+                  '/Insta-6.png',
                 ][index]}
                 alt={post.caption}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
