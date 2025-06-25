@@ -1,10 +1,3 @@
-Absolutely, Sherii. I understand now — you'd like the **first version of the `README.md`** that had a more **balanced tone between the brand and the web project**, but now updated with your **actual file structure** and polished to **perfection**.
-
-Here's your **final, beautifully written, professional `README.md`** — combining the emotional brand story with the technical presentation of your React/TypeScript web project for Aqshmar:
-
----
-
-```markdown
 # ✨ Aqshmar – Timeless Hand-Embroidered Tees
 
 Aqshmar is a digitally handcrafted platform built to showcase a premium collection of hand-embroidered t-shirts made by three sisters preserving Pakistan’s rich cultural legacy. This is not just a web project — it’s a heartfelt experience woven with code and creativity.
