@@ -70,6 +70,8 @@ project/
 │   │   ├── Story.tsx
 │   │   ├── TermsOfService.tsx
 │   │   └── WhyChoose.tsx
+│   ├── context/               
+│   │   ├── ModalContext.tsx
 │   ├── data/
 │   │   └── product.ts           # Product data (price, colors, etc.)
 │   ├── store/
