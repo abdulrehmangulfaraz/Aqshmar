@@ -174,7 +174,7 @@ const Cart: React.FC = () => {
                 </motion.button>
 
                 <p className="text-xs text-warm-gray text-center mt-3">
-                  Secure checkout via WhatsApp • Free shipping on orders over Rs. 10,000
+                  Secure checkout via WhatsApp • Free shipping on orders over Rs. 3,500
                 </p>
               </div>
             )}

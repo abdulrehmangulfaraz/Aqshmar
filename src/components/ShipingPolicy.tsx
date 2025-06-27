@@ -29,7 +29,7 @@ const shippingSections = [
     content: (
       <ul className="list-disc pl-5 space-y-2">
         <li>Flat Rate Shipping: PKR 250</li>
-        <li>Free Shipping: On orders above PKR 10,000</li>
+        <li>Free Shipping: On orders above PKR 3,500</li>
       </ul>
     )
   },

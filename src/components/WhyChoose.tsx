@@ -47,7 +47,7 @@ const WhyChoose: React.FC = () => {
   ];
 
   return (
-    <section className="relative py-20 lg:py-32 bg-rose-blush overflow-hidden">
+    <section id="whychoose"className="relative py-20 lg:py-32 bg-rose-blush overflow-hidden">
       {/* Decorative embroidery pattern */}
       <div className="absolute inset-0 opacity-5 bg-[url('https://img.icons8.com/ios/50/000000/embroidery.png')] bg-repeat bg-[size:25px] pointer-events-none" />
       

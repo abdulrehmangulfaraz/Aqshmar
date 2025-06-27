@@ -13,7 +13,7 @@ const Footer = () => {
   ];
 
   const supportLinks = [
-    { label: 'Care Instructions', href: '#care' },
+    { label: 'Why Aqshmar?', href: '#whychoose' },
     { label: 'Custom Orders', href: '#contact' },
   ];
 
