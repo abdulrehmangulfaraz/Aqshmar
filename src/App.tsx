@@ -10,6 +10,7 @@ import InstagramFeed from './components/InstagramFeed';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Cart from './components/Cart';
+import { ModalContainer } from './components/ModalContainer'; // ✅ import the modal handler
 
 function App() {
   return (
@@ -25,6 +26,9 @@ function App() {
       <Contact />
       <Footer />
       <Cart />
+
+      {/* ✅ Handles rendering of modals like Privacy, Terms, Return, Shipping */}
+      <ModalContainer />
     </div>
   );
 }

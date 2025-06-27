@@ -1,8 +1,10 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Instagram, Mail, Heart, ExternalLink } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
 
-const Footer: React.FC = () => {
+const Footer = () => {
+  const { openModal } = useModal();
+
   const quickLinks = [
     { label: 'Our Story', href: '#story' },
     { label: 'Collection', href: '#collection' },
@@ -13,8 +15,6 @@ const Footer: React.FC = () => {
   const supportLinks = [
     { label: 'Care Instructions', href: '#care' },
     { label: 'Custom Orders', href: '#contact' },
-    { label: 'Shipping Info', href: '#shipping' },
-    { label: 'Returns Policy', href: '#returns' },
   ];
 
   return (
@@ -134,6 +134,36 @@ const Footer: React.FC = () => {
                     </a>
                   </motion.li>
                 ))}
+                <motion.li
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  viewport={{ once: true }}
+                >
+                  <button
+                    onClick={() => openModal('shipping')}
+                    className="text-rose-blush hover:text-pearl-white transition-colors duration-300 flex items-center group"
+                  >
+                    <span className="group-hover:translate-x-1 transition-transform duration-300">
+                      Shipping Policy
+                    </span>
+                  </button>
+                </motion.li>
+                <motion.li
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  viewport={{ once: true }}
+                >
+                  <button
+                    onClick={() => openModal('return')}
+                    className="text-rose-blush hover:text-pearl-white transition-colors duration-300 flex items-center group"
+                  >
+                    <span className="group-hover:translate-x-1 transition-transform duration-300">
+                      Returns Policy
+                    </span>
+                  </button>
+                </motion.li>
               </ul>
             </motion.div>
           </div>
@@ -190,20 +220,20 @@ const Footer: React.FC = () => {
             </motion.div>
             
             <div className="flex items-center space-x-6 text-sm text-rose-blush">
-              <motion.a
-                href="#privacy"
+              <motion.button
+                onClick={() => openModal('privacy')}
                 className="hover:text-pearl-white transition-colors duration-300"
                 whileHover={{ y: -2 }}
               >
                 Privacy Policy
-              </motion.a>
-              <motion.a
-                href="#terms"
+              </motion.button>
+              <motion.button
+                onClick={() => openModal('terms')}
                 className="hover:text-pearl-white transition-colors duration-300"
                 whileHover={{ y: -2 }}
               >
                 Terms of Service
-              </motion.a>
+              </motion.button>
             </div>
           </div>
         </motion.div>

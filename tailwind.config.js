@@ -11,6 +11,18 @@ export default {
         'warm-gray': '#7C7C7C',
         'pearl-white': '#FFFDFB',
         'dust-beige': '#E0D6CE',
+         maroon: {
+          50: '#faf5f5',
+          100: '#f5ebeb',
+          200: '#e6cdcd',
+          300: '#d7afaf',
+          400: '#b97474',
+          500: '#9b3838',
+          600: '#8b3232',
+          700: '#742a2a',
+          800: '#5c2222',
+          900: '#4b1b1b',
+        },
       },
       fontFamily: {
         'serif': ['Cormorant Garamond', 'serif'],
