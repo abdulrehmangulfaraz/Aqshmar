@@ -52,8 +52,6 @@ It includes:
 ```
 
 project/
-├── dist/                         # Production build output
-├── node\_modules/
 ├── public/                       # Static assets like images, logos
 ├── src/
 │   ├── components/               # UI components
@@ -64,16 +62,20 @@ project/
 │   │   ├── Footer.tsx
 │   │   ├── Hero.tsx
 │   │   ├── InstagramFeed.tsx
+│   │   ├── ModalContainer.tsx
 │   │   ├── Navbar.tsx
+│   │   ├── PrivacyPolicy.tsx
+│   │   ├── ReturnPolicy.tsx
+│   │   ├── ShippingPolicy.tsx
 │   │   ├── Story.tsx
-│   │   ├── Testimonials.tsx
+│   │   ├── TermsOfService.tsx
 │   │   └── WhyChoose.tsx
 │   ├── data/
-│   │   └── products.ts           # Product data (price, colors, etc.)
+│   │   └── product.ts           # Product data (price, colors, etc.)
 │   ├── store/
-│   │   └── cartStore.ts          # Zustand-based cart logic
-│   ├── types/
-│   │   └── index.ts              # TypeScript interfaces
+│   │   ├── cartStore.ts          # Zustand-based cart logic
+│   │   └── types/
+│   │       └── index.ts          # TypeScript interfaces
 │   ├── App.tsx
 │   ├── index.css
 │   ├── main.tsx
@@ -82,7 +84,7 @@ project/
 ├── tailwind.config.js
 ├── postcss.config.js
 ├── vite.config.ts
-├── tsconfig\*.json
+├── tsconfig*.json
 ├── package.json
 ├── LICENSE.md
 ├── README.md
