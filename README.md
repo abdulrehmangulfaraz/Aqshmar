@@ -10,8 +10,8 @@ Aqshmar is a digitally handcrafted platform built to showcase a premium collecti
 
 ---
 
-## 🧶 About the Brand
-
+## 🧶 About the Brand 
+ 
 > _“Every thread carries the wisdom of generations, every stitch tells a story of love.”_
 
 **Aqshmar** began when three sisters — Maryam, Aqsa, and Ayesha — discovered their grandmother’s embroidery chest. Inspired by its patterns and memories, they vowed to preserve this art through a clothing line that respects tradition and speaks to today’s aesthetic.
