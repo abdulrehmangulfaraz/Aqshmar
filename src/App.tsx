@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Story from './components/Story';
@@ -10,26 +11,36 @@ import InstagramFeed from './components/InstagramFeed';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Cart from './components/Cart';
-import { ModalContainer } from './components/ModalContainer'; // ✅ import the modal handler
+import { ModalContainer } from './components/ModalContainer';
+import Admin from './components/Admin'; // Import the Admin component
+
+const MainLayout = () => (
+  <>
+    <Navbar />
+    <Hero />
+    <Story />
+    <Craftsmanship />
+    <Collection />
+    <WhyChoose />
+    <Testimonials />
+    <InstagramFeed />
+    <Contact />
+    <Footer />
+    <Cart />
+    <ModalContainer />
+  </>
+);
 
 function App() {
   return (
-    <div className="min-h-screen bg-pearl-white">
-      <Navbar />
-      <Hero />
-      <Story />
-      <Craftsmanship />
-      <Collection />
-      <WhyChoose />
-      <Testimonials />
-      <InstagramFeed />
-      <Contact />
-      <Footer />
-      <Cart />
-
-      {/* ✅ Handles rendering of modals like Privacy, Terms, Return, Shipping */}
-      <ModalContainer />
-    </div>
+    <Router>
+      <div className="min-h-screen bg-pearl-white">
+        <Routes>
+          <Route path="/" element={<MainLayout />} />
+          <Route path="/admin" element={<Admin />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
