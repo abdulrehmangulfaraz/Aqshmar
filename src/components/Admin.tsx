@@ -11,6 +11,7 @@ const toBase64 = (file: File): Promise<string> =>
     reader.readAsDataURL(file);
     reader.onload = () => {
       const result = reader.result as string;
+      // Return only the Base64 part of the data URL
       resolve(result.split(",")[1]);
     };
     reader.onerror = (error) => reject(error);
@@ -343,7 +344,7 @@ const Admin: React.FC = () => {
 
       const content = atob((fileData as any).content);
       const updatedProducts = [...products, newProduct];
-      const newContent = `import { Product } from '../types';\n\nexport const products: Product[] = ${JSON.stringify(
+      const newContent = `// src/data/products.ts\nimport { Product } from '../types';\n\nexport const products: Product[] = ${JSON.stringify(
         updatedProducts,
         null,
         2
@@ -365,6 +366,7 @@ const Admin: React.FC = () => {
       alert("There was an error adding the product. Check the console for details.");
     }
   };
+
 
   /* Fancy button pulse */
   const [celebrate, setCelebrate] = useState(false);
