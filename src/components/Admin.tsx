@@ -1,303 +1,568 @@
-import React, { useState } from 'react';
-import { Product } from '../types';
-import { products } from '../data/products';
+import React, { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Product } from "../types";
+import { products } from "../data/products";
+
+/* ----------------------------- Utility bits ----------------------------- */
+
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6, delay } },
+});
+
+const shimmer =
+  "bg-[linear-gradient(110deg,transparent,rgba(255,255,255,.25),transparent)] bg-[length:200%_100%] animate-[shimmer_2.5s_infinite]";
+
+const threadGradient =
+  "bg-[conic-gradient(from_120deg,rgba(244,63,94,0.95),rgba(245,158,11,0.95),rgba(147,51,234,0.95),rgba(244,63,94,0.95))]";
+
+const labelTone =
+  "text-[0.8rem] tracking-wide uppercase font-semibold opacity-80";
+
+/* Subtle woven pattern using a data-uri SVG so it works anywhere */
+const wovenLight =
+  "bg-[url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23e6c6bf' stroke-opacity='0.35' stroke-width='0.6'%3E%3Cpath d='M0 10h80M0 30h80M0 50h80M0 70h80'/%3E%3Cpath d='M10 0v80M30 0v80M50 0v80M70 0v80'/%3E%3C/g%3E%3C/svg%3E\")]";
+const wovenDark =
+  "bg-[url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%235b1e3f' stroke-opacity='0.45' stroke-width='0.6'%3E%3Cpath d='M0 10h80M0 30h80M0 50h80M0 70h80'/%3E%3Cpath d='M10 0v80M30 0v80M50 0v80M70 0v80'/%3E%3C/g%3E%3C/svg%3E\")]";
+
+/* ----------------------------- Reusable UI ------------------------------ */
+
+const SectionCard: React.FC<
+  React.PropsWithChildren<{ title: React.ReactNode; dark: boolean }>
+> = ({ title, dark, children }) => {
+  return (
+    <motion.section
+      whileHover={{ scale: 1.005 }}
+      className={[
+        "relative rounded-3xl border shadow-xl overflow-hidden transition",
+        dark
+          ? "bg-white/5 border-white/10"
+          : "bg-white/95 border-rose-200/50",
+      ].join(" ")}
+    >
+      {/* Glowing stitched top border */}
+      <div
+        className={[
+          "h-1.5 w-full",
+          threadGradient,
+          "opacity-90",
+          "shadow-[0_0_25px_rgba(245,158,11,0.25)]",
+        ].join(" ")}
+      />
+      <div className="p-8 md:p-10">
+        <h3
+          className={[
+            "mb-6 text-2xl md:text-3xl font-serif font-extrabold tracking-tight",
+            "inline-flex items-center gap-3",
+          ].join(" ")}
+        >
+          <span
+            className={[
+              "inline-block w-8 h-8 rounded-full",
+              "shadow ring-2 ring-white/30",
+              threadGradient,
+            ].join(" ")}
+          />
+          <span
+            className={[
+              "bg-clip-text text-transparent",
+              "bg-gradient-to-r from-rose-600 via-amber-500 to-purple-700",
+            ].join(" ")}
+          >
+            {title}
+          </span>
+        </h3>
+        {children}
+      </div>
+      {/* Subtle bottom thread */}
+      <div className="absolute -bottom-1 left-10 right-10 h-[2px] bg-gradient-to-r from-transparent via-rose-400/60 to-transparent" />
+    </motion.section>
+  );
+};
+
+type FieldProps = {
+  label: string;
+  icon?: string; // emoji or small symbol
+  hint?: string;
+  dark: boolean;
+} & React.InputHTMLAttributes<HTMLInputElement>;
+
+const Field: React.FC<FieldProps> = ({
+  label,
+  icon,
+  hint,
+  dark,
+  className,
+  ...props
+}) => {
+  return (
+    <label className="group block">
+      <div className="flex items-center gap-2 mb-2">
+        {icon && <span className="text-base">{icon}</span>}
+        <span className={labelTone}>{label}</span>
+      </div>
+      <input
+        {...props}
+        className={[
+          "w-full px-5 py-4 rounded-2xl border outline-none shadow-sm",
+          "transition focus:ring-2 focus:ring-offset-0",
+          dark
+            ? "bg-white/10 border-white/15 text-white placeholder-rose-200/60 focus:ring-rose-400/60"
+            : "bg-white border-rose-200 text-rose-900 placeholder-rose-400/70 focus:ring-amber-500/70",
+          "group-hover:shadow-md",
+          "ring-0",
+          "focus:shadow-[0_0_0_4px_rgba(245,158,11,0.08)]",
+          className || "",
+        ].join(" ")}
+      />
+      {hint && (
+        <p className={["mt-2 text-xs opacity-70", dark ? "text-rose-200/80" : "text-rose-700/80"].join(" ")}>
+          {hint}
+        </p>
+      )}
+    </label>
+  );
+};
+
+type TextAreaProps = {
+  label: string;
+  icon?: string;
+  hint?: string;
+  dark: boolean;
+} & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+
+const FieldArea: React.FC<TextAreaProps> = ({
+  label,
+  icon,
+  hint,
+  dark,
+  className,
+  ...props
+}) => (
+  <label className="group block">
+    <div className="flex items-center gap-2 mb-2">
+      {icon && <span className="text-base">{icon}</span>}
+      <span className={labelTone}>{label}</span>
+    </div>
+    <textarea
+      {...props}
+      className={[
+        "w-full px-5 py-4 rounded-2xl border outline-none shadow-sm",
+        "transition focus:ring-2 focus:ring-offset-0",
+        dark
+          ? "bg-white/10 border-white/15 text-white placeholder-rose-200/60 focus:ring-rose-400/60"
+          : "bg-white border-rose-200 text-rose-900 placeholder-rose-400/70 focus:ring-amber-500/70",
+        "group-hover:shadow-md",
+        "focus:shadow-[0_0_0_4px_rgba(244,63,94,0.08)]",
+        className || "",
+      ].join(" ")}
+    />
+    {hint && (
+      <p className={["mt-2 text-xs opacity-70", dark ? "text-rose-200/80" : "text-rose-700/80"].join(" ")}>
+        {hint}
+      </p>
+    )}
+  </label>
+);
+
+const ThreadDivider: React.FC<{ dark: boolean; className?: string }> = ({
+  dark,
+  className,
+}) => (
+  <div className={["relative my-2", className || ""].join(" ")}>
+    <div
+      className={[
+        "h-[2px] w-full rounded-full overflow-hidden",
+        dark ? "bg-rose-100/10" : "bg-rose-900/10",
+      ].join(" ")}
+    >
+      <div
+        className={[
+          "h-full w-1/3",
+          threadGradient,
+          "animate-[slide_3.6s_linear_infinite]",
+        ].join(" ")}
+      />
+    </div>
+  </div>
+);
+
+/* ------------------------------- Main Page ------------------------------ */
 
 const Admin: React.FC = () => {
-  const [product, setProduct] = useState<Omit<Product, 'id'>>({
-    name: '',
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Persist theme so it feels intentional and personal
+  useEffect(() => {
+    const saved = localStorage.getItem("aqshmar-theme");
+    if (saved) setDarkMode(saved === "dark");
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("aqshmar-theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
+
+  const [product, setProduct] = useState<Omit<Product, "id">>({
+    name: "",
     price: 0,
-    image: '',
-    description: '',
+    image: "",
+    description: "",
     sizes: [],
     colors: [],
-    fabric: '',
-    category: '',
+    fabric: "",
+    category: "",
     featured: false,
     isNew: false,
     tags: [],
     careInstructions: [],
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    setProduct(prev => ({
+    setProduct((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setProduct(prev => ({
+    setProduct((prev) => ({
       ...prev,
-      [name]: value.split(',').map(item => item.trim())
+      [name]: value.split(",").map((item) => item.trim()),
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newProduct: Product = {
-      id: `aqs-${String(products.length + 1).padStart(3, '0')}`,
-      ...product
+      id: `aqs-${String(products.length + 1).padStart(3, "0")}`,
+      ...product,
     };
-    console.log('New Product Added:', newProduct);
-    alert('Product added! Check the console for the new product data.');
+    console.log("New Product Added:", newProduct);
+    // A gentle celebratory pulse instead of a plain alert vibe
+    setCelebrate(true);
+    setTimeout(() => setCelebrate(false), 1600);
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-purple-50 p-8 md:p-12 lg:p-16 font-sans">
-      {/* Header Section */}
-      <header className="max-w-7xl mx-auto mb-20 text-center">
-        <div className="flex justify-center mb-8">
-          <div className="w-24 h-24 bg-gradient-to-br from-amber-600 to-rose-600 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300">
-            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-          </div>
-        </div>
-        <h1 className="text-5xl md:text-6xl font-serif font-extrabold text-amber-900 mb-4 tracking-wide leading-tight">Aqshmar Admin Masterpiece Hub</h1>
-        <p className="text-xl md:text-2xl text-amber-700 opacity-90 max-w-3xl mx-auto leading-relaxed">Elevate Your Brand • Curate Timeless Handcrafted Elegance with Every New Creation</p>
-        <div className="mt-6 w-40 h-1.5 bg-gradient-to-r from-amber-500 to-rose-500 mx-auto rounded-full shadow-inner"></div>
-      </header>
-      
-      <main className="max-w-7xl mx-auto">
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-amber-200/30 p-6 md:p-10 lg:p-12 transform hover:shadow-3xl transition-all duration-300">
-          {/* Form Header */}
-          <div className="bg-gradient-to-br from-amber-700 to-purple-800 p-10 md:p-12 lg:p-14 text-white relative overflow-hidden rounded-t-3xl">
-            <div className="absolute inset-0 opacity-20 pointer-events-none">
-              <svg viewBox="0 0 200 200" className="w-full h-full text-white">
-                <path d="M20 100 Q70 20 120 100 T180 100" stroke="currentColor" strokeWidth="1" fill="none" />
-                <path d="M30 110 Q80 30 130 110 T190 110" stroke="currentColor" strokeWidth="1" fill="none" />
-                <path d="M10 90 Q60 10 110 90 T170 90" stroke="currentColor" strokeWidth="1" fill="none" />
-              </svg>
-            </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold relative z-10 mb-4 leading-tight">Craft Your Next Legacy</h2>
-            <p className="text-lg md:text-xl opacity-90 relative z-10 max-w-2xl leading-relaxed">Unleash the artistry of Aqshmar with every stitch, blending heritage and innovation for the world to admire.</p>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="p-6 md:p-10 lg:p-12 space-y-10">
-            {/* Basic Information Section */}
-            <section className="space-y-8">
-              <div className="flex items-center gap-5">
-                <div className="w-3 h-12 bg-gradient-to-b from-amber-500 to-rose-500 rounded-full shadow-md"></div>
-                <h3 className="text-2xl md:text-3xl font-serif font-semibold text-amber-900">Core Craft Details</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label htmlFor="name" className="block text-sm md:text-base font-medium text-amber-800">Product Title</label>
-                  <input 
-                    type="text" 
-                    name="name" 
-                    id="name" 
-                    onChange={handleChange} 
-                    className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md placeholder-amber-400/50"
-                    placeholder="e.g., The Celestial Embroidery Dress"
-                  />
-                </div>
-                
-                <div className="space-y-3">
-                  <label htmlFor="price" className="block text-sm md:text-base font-medium text-amber-800">Price (USD)</label>
-                  <input 
-                    type="number" 
-                    name="price" 
-                    id="price" 
-                    onChange={handleChange} 
-                    className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md placeholder-amber-400/50"
-                    placeholder="99.99"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <label htmlFor="image" className="block text-sm md:text-base font-medium text-amber-800">Image Filename</label>
-                <input 
-                  type="text" 
-                  name="image" 
-                  id="image" 
-                  onChange={handleChange} 
-                  className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md placeholder-amber-400/50"
-                  placeholder="e.g., celestial-dress-001.jpg"
-                />
-                <p className="text-xs md:text-sm text-amber-600 opacity-80">Upload to assets folder with .jpg, .png, or .webp extension.</p>
-              </div>
-              
-              <div className="space-y-3">
-                <label htmlFor="description" className="block text-sm md:text-base font-medium text-amber-800">Narrative Description</label>
-                <textarea 
-                  name="description" 
-                  id="description" 
-                  onChange={handleChange} 
-                  rows={5} 
-                  className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md placeholder-amber-400/50"
-                  placeholder="Weave a story of inspiration, craftsmanship, and cultural significance..."
-                ></textarea>
-              </div>
-            </section>
-            
-            {/* Specifications Section */}
-            <section className="space-y-8 pt-10 border-t border-amber-200/20">
-              <div className="flex items-center gap-5">
-                <div className="w-3 h-12 bg-gradient-to-b from-amber-500 to-rose-500 rounded-full shadow-md"></div>
-                <h3 className="text-2xl md:text-3xl font-serif font-semibold text-amber-900">Artisan Specifications</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label htmlFor="sizes" className="block text-sm md:text-base font-medium text-amber-800">Size Options (comma-separated)</label>
-                  <input 
-                    type="text" 
-                    name="sizes" 
-                    id="sizes" 
-                    onChange={handleArrayChange} 
-                    className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md placeholder-amber-400/50"
-                    placeholder="XS, S, M, L, XL, XXL"
-                  />
-                </div>
-                
-                <div className="space-y-3">
-                  <label htmlFor="colors" className="block text-sm md:text-base font-medium text-amber-800">Color Palette (comma-separated)</label>
-                  <input 
-                    type="text" 
-                    name="colors" 
-                    id="colors" 
-                    onChange={handleArrayChange} 
-                    className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md placeholder-amber-400/50"
-                    placeholder="Emerald Green, Saffron Gold, Midnight Navy"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label htmlFor="fabric" className="block text-sm md:text-base font-medium text-amber-800">Fabric Essence</label>
-                  <input 
-                    type="text" 
-                    name="fabric" 
-                    id="fabric" 
-                    onChange={handleChange} 
-                    className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md placeholder-amber-400/50"
-                    placeholder="e.g., Handwoven Silk with Organic Cotton Blend"
-                  />
-                </div>
-                
-                <div className="space-y-3">
-                  <label htmlFor="category" className="block text-sm md:text-base font-medium text-amber-800">Collection Category</label>
-                  <select 
-                    name="category" 
-                    id="category" 
-                    onChange={handleChange} 
-                    className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md appearance-none"
-                  >
-                    <option value="">Select a Prestigious Category</option>
-                    <option>Embroidered Heritage</option>
-                    <option>Matching Ensembles</option>
-                    <option>Luxury Sweatshirts</option>
-                    <option>Premium Hoodies</option>
-                    <option>Designer Couture</option>
-                    <option>Active Elegance</option>
-                    <option>Graphic Masterpieces</option>
-                    <option>Floral Symphony</option>
-                    <option>Limited Editions</option>
-                    <option>Kids' Treasures</option>
-                    <option>Bespoke Creations</option>
-                    <option>Political Statements</option>
-                    <option>Pop Culture Icons</option>
-                  </select>
-                </div>
-              </div>
-            </section>
-            
-            {/* Additional Information Section */}
-            <section className="space-y-8 pt-10 border-t border-amber-200/20">
-              <div className="flex items-center gap-5">
-                <div className="w-3 h-12 bg-gradient-to-b from-amber-500 to-rose-500 rounded-full shadow-md"></div>
-                <h3 className="text-2xl md:text-3xl font-serif font-semibold text-amber-900">Refined Touches</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label htmlFor="tags" className="block text-sm md:text-base font-medium text-amber-800">Discovery Tags (comma-separated)</label>
-                  <input 
-                    type="text" 
-                    name="tags" 
-                    id="tags" 
-                    onChange={handleArrayChange} 
-                    className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md placeholder-amber-400/50"
-                    placeholder="handcrafted, luxury, ethnic-chic, seasonal-trends"
-                  />
-                </div>
-                
-                <div className="space-y-3">
-                  <label htmlFor="careInstructions" className="block text-sm md:text-base font-medium text-amber-800">Care Rituals (comma-separated)</label>
-                  <input 
-                    type="text" 
-                    name="careInstructions" 
-                    id="careInstructions" 
-                    onChange={handleArrayChange} 
-                    className="w-full px-6 py-4 rounded-2xl border border-amber-200/40 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all bg-white/70 shadow-md placeholder-amber-400/50"
-                    placeholder="Hand wash with care, Dry flat, Steam iron gently"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-6 pt-5">
-                <label className="flex items-center cursor-pointer space-x-4">
-                  <input 
-                    type="checkbox" 
-                    name="featured" 
-                    id="featured" 
-                    onChange={handleChange} 
-                    className="w-5 h-5 text-amber-600 border-amber-300 rounded focus:ring-amber-400 sr-only peer"
-                  />
-                  <div className="w-5 h-5 mr-3 border-2 border-amber-300 rounded bg-white peer-checked:bg-amber-600 peer-checked:border-transparent transition-all flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm md:text-base font-medium text-amber-800">Highlight as Featured</span>
-                </label>
-                
-                <label className="flex items-center cursor-pointer space-x-4">
-                  <input 
-                    type="checkbox" 
-                    name="isNew" 
-                    id="isNew" 
-                    onChange={handleChange} 
-                    className="w-5 h-5 text-amber-600 border-amber-300 rounded focus:ring-amber-400 sr-only peer"
-                  />
-                  <div className="w-5 h-5 mr-3 border-2 border-amber-300 rounded bg-white peer-checked:bg-amber-600 peer-checked:border-transparent transition-all flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm md:text-base font-medium text-amber-800">Mark as New Arrival</span>
-                </label>
-              </div>
-            </section>
-            
-            {/* Submit Button */}
-            <div className="pt-12 border-t border-amber-200/20 flex justify-center">
-              <button 
-                type="submit" 
-                className="group px-14 py-5 text-lg md:text-xl text-white bg-gradient-to-r from-amber-600 via-rose-600 to-purple-600 hover:from-amber-700 hover:via-rose-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-amber-300/50 rounded-2xl shadow-lg font-serif font-semibold transition-all duration-300 flex items-center gap-4 transform hover:scale-105 hover:shadow-xl"
-              >
-                <svg className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                Launch This Masterpiece
-              </button>
-            </div>
-          </form>
-        </div>
+  /* Fancy button pulse */
+  const [celebrate, setCelebrate] = useState(false);
 
-        {/* Footer Note */}
-        <footer className="mt-20 text-center text-amber-700 text-lg md:text-xl opacity-90">
-          <p className="italic font-serif">"Where every thread sings a song of heritage, and every stitch crafts a legacy."</p>
-          <p className="mt-3 font-serif text-xl md:text-2xl">— The Vision of Aqshmar</p>
-        </footer>
+  /* Computed background classes */
+  const shell = useMemo(
+    () =>
+      darkMode
+        ? "bg-gradient-to-br from-[#0f0f12] via-[#1b0b18] to-[#0a0a0a] text-white"
+        : "bg-gradient-to-br from-[#fffaf7] via-[#fff3ed] to-[#fffaf8] text-rose-900",
+    [darkMode]
+  );
+
+  return (
+    <div
+      className={[
+        "min-h-screen relative overflow-x-hidden transition-colors duration-500 font-sans",
+        shell,
+      ].join(" ")}
+    >
+      {/* Woven background overlays */}
+      <div
+        className={[
+          "pointer-events-none absolute inset-0 opacity-50",
+          darkMode ? wovenDark : wovenLight,
+        ].join(" ")}
+      />
+      {/* Soft radial vignette for depth */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          maskImage:
+            "radial-gradient(60% 60% at 50% 35%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:
+            "radial-gradient(60% 60% at 50% 35%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0) 100%)",
+        }}
+      />
+
+      {/* Top Bar */}
+      <header
+        className={[
+          "sticky top-0 z-30 backdrop-blur-xl border-b",
+          darkMode ? "bg-[#0f0f12]/60 border-white/10" : "bg-white/70 border-rose-200/50",
+        ].join(" ")}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span
+              className={[
+                "inline-block w-9 h-9 rounded-full ring-2 ring-white/40",
+                threadGradient,
+                shimmer,
+              ].join(" ")}
+              aria-hidden
+            />
+            <h1 className="text-2xl md:text-3xl font-serif font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-rose-700 via-amber-600 to-purple-700">
+              Aqshmar Admin Hub
+            </h1>
+          </div>
+
+          <button
+            onClick={() => setDarkMode((d) => !d)}
+            className={[
+              "px-4 md:px-5 py-2 rounded-full font-medium shadow-md transition-all",
+              darkMode
+                ? "bg-gradient-to-r from-amber-400 to-rose-400 text-black hover:brightness-110"
+                : "bg-gradient-to-r from-rose-600 to-amber-500 text-white hover:brightness-110",
+            ].join(" ")}
+            aria-label="Toggle theme"
+          >
+            {darkMode ? "☀️ Light" : "🌙 Dark"}
+          </button>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <motion.section
+        {...fadeUp(0.05)}
+        className="relative max-w-4xl mx-auto px-6 pt-10 md:pt-14 pb-6 text-center"
+      >
+        <div className="relative inline-block">
+          <h2 className="text-4xl md:text-5xl font-serif font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-rose-700 via-amber-600 to-purple-700">
+            Curate a Timeless Masterpiece
+          </h2>
+          <ThreadDivider dark={darkMode} />
+        </div>
+        <p
+          className={[
+            "mt-4 md:mt-5 text-lg md:text-xl leading-relaxed mx-auto max-w-3xl",
+            darkMode ? "text-rose-100/85" : "text-rose-900/80",
+          ].join(" ")}
+        >
+          Every thread carries wisdom. Every stitch tells a story. Craft a new
+          heirloom for Aqshmar’s collection.
+        </p>
+      </motion.section>
+
+      {/* Form */}
+      <main className="relative max-w-7xl mx-auto px-6 pb-20">
+        <form onSubmit={handleSubmit} className="grid gap-10 md:gap-12">
+          {/* Core Details */}
+          <SectionCard title="Core Details" dark={darkMode}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Field
+                label="Product Title"
+                icon="🪡"
+                hint="Give it a name that feels like a story."
+                name="name"
+                placeholder="e.g., The Celestial Tee"
+                onChange={handleChange}
+                dark={darkMode}
+                autoComplete="off"
+              />
+              <Field
+                label="Price (USD)"
+                icon="💠"
+                hint="Reflects effort (15+ hours) & artistry."
+                name="price"
+                type="number"
+                placeholder="99.99"
+                onChange={handleChange}
+                dark={darkMode}
+                min="0"
+                step="0.01"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-8">
+              <Field
+                label="Image Filename"
+                icon="🖼"
+                name="image"
+                placeholder="aqshmar-tee-001.jpg"
+                onChange={handleChange}
+                dark={darkMode}
+                autoComplete="off"
+              />
+              <FieldArea
+                label="Description"
+                icon="📜"
+                name="description"
+                placeholder="Describe the pattern, the story, and the feeling it carries…"
+                rows={5}
+                onChange={handleChange}
+                dark={darkMode}
+              />
+            </div>
+          </SectionCard>
+
+          {/* Specifications */}
+          <SectionCard title="Specifications" dark={darkMode}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Field
+                label="Sizes"
+                icon="📏"
+                hint="Comma-separated, e.g., XS, S, M, L, XL"
+                name="sizes"
+                placeholder="XS, S, M, L, XL"
+                onChange={handleArrayChange}
+                dark={darkMode}
+              />
+              <Field
+                label="Colors"
+                icon="🎨"
+                hint="Comma-separated, e.g., Emerald Green, Crimson Red, Pearl White"
+                name="colors"
+                placeholder="Emerald Green, Crimson Red, Pearl White"
+                onChange={handleArrayChange}
+                dark={darkMode}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Field
+                label="Fabric"
+                icon="🧶"
+                name="fabric"
+                placeholder="Handwoven Cotton, Silk Blend"
+                onChange={handleChange}
+                dark={darkMode}
+              />
+
+              <label className="block">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-base">🏷</span>
+                  <span className={labelTone}>Category</span>
+                </div>
+                <select
+                  name="category"
+                  onChange={handleChange}
+                  className={[
+                    "w-full px-5 py-4 rounded-2xl border shadow-sm outline-none transition focus:ring-2",
+                    darkMode
+                      ? "bg-white/10 border-white/15 text-white focus:ring-rose-400/60"
+                      : "bg-white border-rose-200 text-rose-900 focus:ring-amber-500/70",
+                  ].join(" ")}
+                >
+                  <option value="">Select Category</option>
+                  <option>Heritage Embroidery</option>
+                  <option>Luxury Casuals</option>
+                  <option>Limited Edition Tees</option>
+                  <option>Everyday Elegance</option>
+                </select>
+              </label>
+            </div>
+          </SectionCard>
+
+          {/* Refined Touches */}
+          <SectionCard title="Refined Touches" dark={darkMode}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Field
+                label="Tags"
+                icon="✨"
+                hint="Comma-separated, e.g., heritage, handcrafted, cultural"
+                name="tags"
+                placeholder="heritage, handcrafted, cultural"
+                onChange={handleArrayChange}
+                dark={darkMode}
+              />
+              <Field
+                label="Care Instructions"
+                icon="🫧"
+                hint="Comma-separated, e.g., Hand wash, Dry flat, Gentle iron"
+                name="careInstructions"
+                placeholder="Hand wash, Dry flat, Gentle iron"
+                onChange={handleArrayChange}
+                dark={darkMode}
+              />
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-8">
+              <label className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  name="featured"
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-amber-500"
+                />
+                <span className="font-medium">Featured</span>
+              </label>
+              <label className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  name="isNew"
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-rose-500"
+                />
+                <span className="font-medium">New Arrival</span>
+              </label>
+            </div>
+          </SectionCard>
+
+          {/* Submit */}
+          <motion.div
+            className="text-center pt-2"
+            animate={celebrate ? { scale: [1, 1.05, 1] } : {}}
+            transition={{ duration: 0.6 }}
+          >
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              className={[
+                "relative inline-flex items-center gap-3 px-16 py-5 rounded-2xl",
+                "text-lg md:text-xl font-semibold text-white shadow-xl",
+                "transition-all",
+                "bg-gradient-to-r from-rose-700 via-amber-600 to-purple-700",
+              ].join(" ")}
+            >
+              <span
+                className={[
+                  "absolute inset-0 rounded-2xl opacity-30",
+                  threadGradient,
+                  celebrate ? shimmer : "",
+                ].join(" ")}
+                aria-hidden
+              />
+              <span className="relative z-10">🚀 Launch Heritage Tee</span>
+            </motion.button>
+          </motion.div>
+        </form>
+
+        {/* Footer */}
+        <motion.footer
+          {...fadeUp(0.1)}
+          className={[
+            "mt-16 md:mt-20 text-center",
+            darkMode ? "text-rose-100/85" : "text-rose-800/85",
+          ].join(" ")}
+        >
+          <p className="italic font-serif text-lg md:text-xl">
+            “Every stitch is a whisper from the past, woven for tomorrow.”
+          </p>
+          <p className="mt-2 font-serif text-xl md:text-2xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 inline-block animate-[shine_6s_linear_infinite]">
+            — Aqshmar Legacy
+          </p>
+        </motion.footer>
       </main>
+
+      {/* Keyframes (tailwind unsupported custom) via style tag */}
+      <style>{`
+        @keyframes slide {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(300%); }
+        }
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        @keyframes shine {
+          0% { filter: brightness(1); }
+          50% { filter: brightness(1.15); }
+          100% { filter: brightness(1); }
+        }
+      `}</style>
     </div>
   );
 };
