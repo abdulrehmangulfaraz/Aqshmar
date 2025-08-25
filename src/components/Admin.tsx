@@ -1,7 +1,20 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { Octokit } from "@octokit/rest";
 import { Product } from "../types";
 import { products } from "../data/products";
+
+// Helper function to convert a file to a Base64 string
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(",")[1]);
+    };
+    reader.onerror = (error) => reject(error);
+  });
 
 /* ----------------------------- Utility bits ----------------------------- */
 
@@ -124,6 +137,47 @@ const Field: React.FC<FieldProps> = ({
   );
 };
 
+const FileField: React.FC<FieldProps> = ({
+  label,
+  icon,
+  hint,
+  dark,
+  className,
+  ...props
+}) => {
+  return (
+    <label className="group block">
+      <div className="flex items-center gap-2 mb-2">
+        {icon && <span className="text-base">{icon}</span>}
+        <span className={labelTone}>{label}</span>
+      </div>
+      <div
+        className={[
+          "w-full px-5 py-4 rounded-2xl border outline-none shadow-sm",
+          "transition focus:ring-2 focus:ring-offset-0",
+          dark
+            ? "bg-white/10 border-white/15 text-white placeholder-rose-200/60 focus:ring-rose-400/60"
+            : "bg-white border-rose-200 text-rose-900 placeholder-rose-400/70 focus:ring-amber-500/70",
+          "group-hover:shadow-md",
+          "ring-0",
+          "focus:shadow-[0_0_0_4px_rgba(245,158,11,0.08)]",
+          "relative",
+        ].join(" ")}
+      >
+        <input {...props} className="absolute inset-0 opacity-0" />
+        <span className="truncate">
+          {props.value ? (props.value as string) : "Choose a file..."}
+        </span>
+      </div>
+      {hint && (
+        <p className={["mt-2 text-xs opacity-70", dark ? "text-rose-200/80" : "text-rose-700/80"].join(" ")}>
+          {hint}
+        </p>
+      )}
+    </label>
+  );
+};
+
 type TextAreaProps = {
   label: string;
   icon?: string;
@@ -215,6 +269,7 @@ const Admin: React.FC = () => {
     tags: [],
     careInstructions: [],
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -223,10 +278,22 @@ const Admin: React.FC = () => {
   ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    setProduct((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+
+    if (type === 'file') {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        setImageFile(file);
+        setProduct((prev) => ({
+          ...prev,
+          image: file.name,
+        }));
+      }
+    } else {
+      setProduct((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
   const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -237,16 +304,66 @@ const Admin: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!imageFile) {
+      alert("Please upload an image.");
+      return;
+    }
+
     const newProduct: Product = {
       id: `aqs-${String(products.length + 1).padStart(3, "0")}`,
       ...product,
     };
-    console.log("New Product Added:", newProduct);
-    // A gentle celebratory pulse instead of a plain alert vibe
-    setCelebrate(true);
-    setTimeout(() => setCelebrate(false), 1600);
+
+    const octokit = new Octokit({
+      auth: import.meta.env.VITE_GITHUB_TOKEN,
+    });
+    const owner = import.meta.env.VITE_GITHUB_OWNER;
+    const repo = import.meta.env.VITE_GITHUB_REPO;
+
+    try {
+      // 1. Upload the image
+      const imageContent = await toBase64(imageFile);
+      await octokit.repos.createOrUpdateFileContents({
+        owner,
+        repo,
+        path: `public/${newProduct.image}`,
+        message: `feat: Add image for ${newProduct.name}`,
+        content: imageContent,
+      });
+
+      // 2. Update products.ts
+      const { data: fileData } = await octokit.repos.getContent({
+        owner,
+        repo,
+        path: "src/data/products.ts",
+      });
+
+      const content = atob((fileData as any).content);
+      const updatedProducts = [...products, newProduct];
+      const newContent = `import { Product } from '../types';\n\nexport const products: Product[] = ${JSON.stringify(
+        updatedProducts,
+        null,
+        2
+      )};\n`;
+
+      await octokit.repos.createOrUpdateFileContents({
+        owner,
+        repo,
+        path: "src/data/products.ts",
+        message: `feat: Add new product - ${newProduct.name}`,
+        content: btoa(newContent),
+        sha: (fileData as any).sha,
+      });
+
+      setCelebrate(true);
+      setTimeout(() => setCelebrate(false), 1600);
+    } catch (error) {
+      console.error("Error committing to GitHub:", error);
+      alert("There was an error adding the product. Check the console for details.");
+    }
   };
 
   /* Fancy button pulse */
@@ -362,12 +479,12 @@ const Admin: React.FC = () => {
                 autoComplete="off"
               />
               <Field
-                label="Price (USD)"
+                label="Price (PKR)"
                 icon="💠"
                 hint="Reflects effort (15+ hours) & artistry."
                 name="price"
                 type="number"
-                placeholder="99.99"
+                placeholder="2499"
                 onChange={handleChange}
                 dark={darkMode}
                 min="0"
@@ -375,15 +492,16 @@ const Admin: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-8">
-              <Field
-                label="Image Filename"
+            <div className="grid grid-cols-1 gap-8 mt-8">
+              <FileField
+                label="Image"
                 icon="🖼"
                 name="image"
-                placeholder="aqshmar-tee-001.jpg"
+                type="file"
+                accept="image/jpeg, image/png"
                 onChange={handleChange}
                 dark={darkMode}
-                autoComplete="off"
+                value={product.image}
               />
               <FieldArea
                 label="Description"
@@ -420,7 +538,7 @@ const Admin: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
               <Field
                 label="Fabric"
                 icon="🧶"
